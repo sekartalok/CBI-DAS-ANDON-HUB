@@ -31,14 +31,14 @@ int wifi_mqtt_handler::wifi_connect(void){
 int wifi_mqtt_handler:: mqtt_handler_init(void){
     if(wifi_connect()){return 1; }
 
-    data_holder = xQueueCreate(0xFF, sizeof(uint8_t));
+    handler_queue = xQueueCreate(0xFF, sizeof(uint8_t));
     
-    if (data_holder == NULL) { return 1; }
+    if (handler_queue == NULL) { return 1; }
    
     
     mqtt.subscribe("sensor/raw_byte", [](const char * topic, const char * payload) {
-        handler_queue = (uint8_t)atoi(payload);
-        xQueueSend(data_holder, &handler_queue,pdMS_TO_TICKS(10));
+        uint8_t val = (uint8_t)atoi(payload);
+        xQueueSend(handler_queue, &val, pdMS_TO_TICKS(10));
 
 
     });
